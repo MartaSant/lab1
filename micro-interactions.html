@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro Interactions - Interactive Website Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Page-specific styles for micro-interactions */
+        
+        .demo-section {
+            margin: var(--spacing-xl) 0;
+        }
+        
+        .demo-title {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            font-size: 1.5rem;
+        }
+        
+        .demo-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+            font-size: 0.9375rem;
+        }
+        
+        .demo-container {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        /* State Button Styles */
+        #state-button {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            min-width: 120px;
+            min-height: 48px;
+        }
+        
+        #state-button:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Flip Card Styles */
+        .flip-card {
+            width: 300px;
+            height: 200px;
+            perspective: 1000px;
+            margin: var(--spacing-md) auto;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform var(--transition-slow);
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .flip-card-front {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .flip-card-back {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        
+        /* Theme Toggle Styles */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin: var(--spacing-md) 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: var(--transition-base);
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: var(--transition-base);
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-preview {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-white);
+            border: 2px solid var(--border-color);
+            transition: all var(--transition-base);
+        }
+        
+        .theme-preview.dark-theme {
+            background-color: var(--bg-dark);
+            color: white;
+            border-color: var(--text-primary);
+        }
+        
+        .theme-text {
+            margin: 0;
+        }
+        
+        /* Tooltip Styles */
+        .tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1.25rem;
+            cursor: help;
+            transition: transform var(--transition-base);
+        }
+        
+        .tooltip-trigger:hover {
+            transform: scale(1.1);
+        }
+        
+        .tooltip {
+            position: absolute;
+            background-color: var(--bg-dark);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .tooltip:after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--bg-dark);
+        }
+        
+        /* Message Styles */
+        .interaction-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all var(--transition-base);
+        }
+        
+        .interaction-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .easter-egg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .easter-egg.visible {
+            opacity: 1;
+        }
+        
+        .easter-egg-content {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 400px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <a href="index.html" class="logo" style="font-weight: 600; color: var(--primary-color); text-decoration: none;">🎨 Playground</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="micro-interactions.html" class="active">Micro Interactions</a></li>
+                <li><a href="scroll-lab.html">Scroll Storytelling</a></li>
+                <li><a href="react-lab.html">React Lab</a></li>
+                <li><a href="vue-lab.html">Vue Lab</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1>✨ Micro Interactions</h1>
+            <p>Small, delightful details that make websites feel responsive and engaging</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Intro Section -->
+        <div class="card mb-lg">
+            <h2>Welcome to the Micro Interactions Lab</h2>
+            <p>
+                This page demonstrates what you can achieve with pure HTML, CSS, and JavaScript. 
+                Each interaction below shows how small details can create a more engaging user experience.
+            </p>
+            <p>
+                Try interacting with each element. Notice how they provide immediate feedback 
+                and make the interface feel alive and responsive.
+            </p>
+        </div>
+
+        <!-- State Button Demo -->
+        <div class="demo-section">
+            <div class="demo-container">
+                <h3 class="demo-title">1. State-Changing Button</h3>
+                <p class="demo-description">
+                    This button shows how we can give feedback to the user when they interact with the site. 
+                    Hover over it, then click to see it transform.
+                </p>
+                <div style="text-align: center; padding: var(--spacing-md);">
+                    <button id="state-button">Hover me</button>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: var(--spacing-sm);">
+                    💡 <strong>Tip:</strong> This is a hover effect that reveals extra information without leaving the page.
+                </p>
+            </div>
+        </div>
+
+        <!-- Flip Card Demo -->
+        <div class="demo-section">
+            <div class="demo-container">
+                <h3 class="demo-title">2. Flip Card</h3>
+                <p class="demo-description">
+                    Hover over the card below to see it flip and reveal additional content. 
+                    This is perfect for showing more information without cluttering the interface.
+                </p>
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div>
+                                <h3 style="margin-bottom: var(--spacing-xs);">Front Side</h3>
+                                <p>Hover to reveal more</p>
+                            </div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div>
+                                <h3 style="margin-bottom: var(--spacing-xs);">Back Side</h3>
+                                <p>Additional information appears here!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: var(--spacing-sm);">
+                    💡 <strong>Tip:</strong> Cards can expand or flip to show more content without navigating away.
+                </p>
+            </div>
+        </div>
+
+        <!-- Theme Toggle Demo -->
+        <div class="demo-section">
+            <div class="demo-container">
+                <h3 class="demo-title">3. Theme Toggle</h3>
+                <p class="demo-description">
+                    Toggle switches allow users to customize their experience. Watch how the preview panel 
+                    changes theme instantly.
+                </p>
+                <div class="toggle-container">
+                    <label for="theme-toggle" style="font-weight: 500;">Light Theme</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label for="theme-toggle" style="font-weight: 500;">Dark Theme</label>
+                </div>
+                <div class="theme-preview">
+                    <p class="theme-text">Light theme selected</p>
+                    <p style="font-size: 0.875rem; margin-top: var(--spacing-sm); opacity: 0.8;">
+                        This is a preview of how the theme looks. Toggle the switch above to see it change.
+                    </p>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: var(--spacing-sm);">
+                    💡 <strong>Tip:</strong> Users can personalize their experience with theme controls.
+                </p>
+            </div>
+        </div>
+
+        <!-- Tooltip Demo -->
+        <div class="demo-section">
+            <div class="demo-container">
+                <h3 class="demo-title">4. Interactive Tooltips</h3>
+                <p class="demo-description">
+                    Hover over the icons below to see helpful tooltips appear. These provide context 
+                    without taking up permanent space on the page.
+                </p>
+                <div style="display: flex; gap: var(--spacing-lg); justify-content: center; flex-wrap: wrap; padding: var(--spacing-md);">
+                    <div class="tooltip-trigger" data-tooltip="This is a help tooltip that appears on hover">?</div>
+                    <div class="tooltip-trigger" data-tooltip="Tooltips can show helpful information">ℹ️</div>
+                    <div class="tooltip-trigger" data-tooltip="They appear and disappear smoothly">✨</div>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: var(--spacing-sm);">
+                    💡 <strong>Tip:</strong> Tooltips provide context and help users understand interface elements.
+                </p>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="card mt-lg">
+            <h3>What You've Learned</h3>
+            <p>
+                These micro-interactions demonstrate that even simple HTML, CSS, and JavaScript can 
+                create engaging, responsive interfaces. Every button hover, card flip, and tooltip 
+                adds to the overall user experience and makes your website feel polished and modern.
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><a href="index.html">← Back to Playground Home</a></p>
+    </footer>
+
+    <!-- Shared JavaScript -->
+    <script src="main.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <script src="micro-interactions.js"></script>
+</body>
+</html>
+

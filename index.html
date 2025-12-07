@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Website Playground - Explore Modern Web Experiences</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <a href="index.html" class="logo" style="font-weight: 600; color: var(--primary-color); text-decoration: none;">🎨 Playground</a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="micro-interactions.html">Micro Interactions</a></li>
+                <li><a href="scroll-lab.html">Scroll Storytelling</a></li>
+                <li><a href="react-lab.html">React Lab</a></li>
+                <li><a href="vue-lab.html">Vue Lab</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1>Interactive Website Playground</h1>
+            <p>Explore different interactive experiences and see what a modern website can do for you.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Progress Indicator -->
+        <div class="progress-container">
+            <h2 class="progress-title">Your Progress</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <p class="progress-text">Experiences tried: 0/4</p>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="card mb-lg">
+            <h2>Welcome to the Playground! 👋</h2>
+            <p>
+                This is a demonstration website that showcases how modern websites can be 
+                <strong>dynamic, playful, and interactive</strong>. Each section below offers 
+                a different approach to web interactivity:
+            </p>
+            <ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--text-secondary);">
+                <li>Pure HTML, CSS, and JavaScript</li>
+                <li>Modern frameworks like React and Vue</li>
+                <li>Scroll-based storytelling</li>
+                <li>Micro-interactions and playful details</li>
+            </ul>
+            <p style="margin-top: 1rem;">
+                Click on the cards below to explore each section. Your progress will be saved 
+                as you visit different pages, and you'll unlock a special message once you've 
+                explored everything!
+            </p>
+        </div>
+
+        <!-- Tips Box -->
+        <div class="tips-box">
+            <h3>💡 Tip</h3>
+            <p class="tips-content">
+                Start with Micro Interactions if you like playful UI details. Then explore the 
+                other sections to see different approaches to interactivity.
+            </p>
+        </div>
+
+        <!-- Feature Cards Grid -->
+        <div class="grid grid-2" style="margin-top: var(--spacing-xl);">
+            <!-- Micro Interactions Card -->
+            <div class="card card-link" data-page-id="micro-interactions">
+                <a href="micro-interactions.html" style="text-decoration: none; color: inherit;">
+                    <h3 class="card-title">✨ Micro Interactions</h3>
+                    <p class="card-description">
+                        Try small animations and playful buttons. See how subtle interactions 
+                        can make a website feel more responsive and engaging.
+                    </p>
+                    <span class="card-status not-visited">Not visited yet</span>
+                </a>
+            </div>
+
+            <!-- Scroll Storytelling Card -->
+            <div class="card card-link" data-page-id="scroll-lab">
+                <a href="scroll-lab.html" style="text-decoration: none; color: inherit;">
+                    <h3 class="card-title">📜 Scroll Storytelling</h3>
+                    <p class="card-description">
+                        Discover how scrolling can guide visitors through a story. Content 
+                        reveals itself as you explore, creating a narrative experience.
+                    </p>
+                    <span class="card-status not-visited">Not visited yet</span>
+                </a>
+            </div>
+
+            <!-- React Lab Card -->
+            <div class="card card-link" data-page-id="react-lab">
+                <a href="react-lab.html" style="text-decoration: none; color: inherit;">
+                    <h3 class="card-title">⚛️ React Lab</h3>
+                    <p class="card-description">
+                        Explore how React can manage complex, stateful interactions. See a 
+                        live configurator that updates in real-time as you make choices.
+                    </p>
+                    <span class="card-status not-visited">Not visited yet</span>
+                </a>
+            </div>
+
+            <!-- Vue Lab Card -->
+            <div class="card card-link" data-page-id="vue-lab">
+                <a href="vue-lab.html" style="text-decoration: none; color: inherit;">
+                    <h3 class="card-title">🎯 Vue Lab</h3>
+                    <p class="card-description">
+                        Experience Vue's reactive data binding. Watch how the interface 
+                        updates automatically as you interact with controls.
+                    </p>
+                    <span class="card-status not-visited">Not visited yet</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Congratulations Box (hidden by default) -->
+        <div class="success-box hidden">
+            <h3>🎉 Congratulations!</h3>
+            <p>
+                You've explored all the main features! Now you have a clearer idea of what 
+                we can build for your website. Feel free to revisit any section to discover 
+                more details and hidden interactions.
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Built with HTML, CSS, and JavaScript • No build tools required</p>
+        <div>
+            <span class="footer-icon" id="secret-icon" title="Try clicking me multiple times">🔍</span>
+        </div>
+    </footer>
+
+    <!-- Shared JavaScript -->
+    <script src="main.js"></script>
+    
+    <!-- Page-specific JavaScript for hidden interaction -->
+    <script>
+        /**
+         * Hidden Interaction: Click the footer icon multiple times to reveal a secret message
+         */
+        (function() {
+            let clickCount = 0;
+            const secretIcon = document.getElementById('secret-icon');
+            const messages = [
+                'Keep exploring!',
+                'Almost there...',
+                'You\'re curious! Click once more...'
+            ];
+            
+            secretIcon.addEventListener('click', function() {
+                clickCount++;
+                
+                if (clickCount === 3) {
+                    // Create and show a special message
+                    const messageBox = document.createElement('div');
+                    messageBox.className = 'success-box';
+                    messageBox.style.position = 'fixed';
+                    messageBox.style.top = '50%';
+                    messageBox.style.left = '50%';
+                    messageBox.style.transform = 'translate(-50%, -50%)';
+                    messageBox.style.zIndex = '1000';
+                    messageBox.style.maxWidth = '400px';
+                    messageBox.style.margin = '0';
+                    messageBox.innerHTML = `
+                        <h3>🎁 Secret Discovered!</h3>
+                        <p>You found a hidden detail! A website can reward curiosity too. 
+                        We can design these playful interactions throughout your site.</p>
+                        <button class="btn" onclick="this.parentElement.remove()" style="margin-top: 1rem;">Close</button>
+                    `;
+                    document.body.appendChild(messageBox);
+                    clickCount = 0; // Reset for future clicks
+                } else if (clickCount < 3) {
+                    // Show temporary hint
+                    secretIcon.title = messages[clickCount - 1];
+                    secretIcon.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        secretIcon.style.transform = '';
+                    }, 200);
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+

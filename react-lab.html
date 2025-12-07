@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Lab - Interactive Website Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- React and ReactDOM from CDN (UMD build - development for better error messages) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <style>
+        /* Page-specific styles for react-lab */
+        
+        .react-intro {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .configurator-container {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .configurator-container h2 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .config-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .config-options {
+            display: grid;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .config-group label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .config-select {
+            padding: var(--spacing-sm);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            background-color: var(--bg-white);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: border-color var(--transition-base);
+        }
+        
+        .config-select:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .config-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-xs);
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            cursor: pointer;
+            font-weight: normal;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        
+        .preview-section {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 2px solid var(--border-color);
+        }
+        
+        .preview-section h3 {
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+        
+        .preview-card {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            transition: all var(--transition-base);
+            border: 2px solid var(--border-color);
+        }
+        
+        .preview-card[data-style="minimal"] {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-color: #d1d5db;
+        }
+        
+        .preview-card[data-style="colorful"] {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #fbbf24;
+        }
+        
+        .preview-card[data-style="elegant"] {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            border-color: #c084fc;
+        }
+        
+        .preview-header {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .preview-header h4 {
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .preview-body p {
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-secondary);
+        }
+        
+        .state-summary {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 2px solid var(--border-color);
+        }
+        
+        .state-summary h3 {
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .state-summary p {
+            color: var(--text-secondary);
+        }
+        
+        .price-estimate {
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .price-estimate h3 {
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+        
+        .price-text {
+            font-size: 1.125rem;
+            color: var(--text-primary);
+        }
+        
+        @media (max-width: 768px) {
+            .configurator-container {
+                padding: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <a href="index.html" class="logo" style="font-weight: 600; color: var(--primary-color); text-decoration: none;">🎨 Playground</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="micro-interactions.html">Micro Interactions</a></li>
+                <li><a href="scroll-lab.html">Scroll Storytelling</a></li>
+                <li><a href="react-lab.html" class="active">React Lab</a></li>
+                <li><a href="vue-lab.html">Vue Lab</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1>⚛️ React Lab</h1>
+            <p>Experience reactive state management with React</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Introduction -->
+        <div class="card react-intro">
+            <h2>Welcome to the React Lab</h2>
+            <p>
+                React is a JavaScript library for building user interfaces. One of its key features 
+                is <strong>reactivity</strong>: when data (state) changes, the UI automatically updates 
+                to reflect those changes.
+            </p>
+            <p>
+                Below, you'll find a <strong>Site Configurator</strong> that demonstrates this. 
+                As you change options, the preview updates in real-time without any manual DOM manipulation. 
+                React handles all the updates automatically.
+            </p>
+            <p>
+                <strong>How it works:</strong> React stores the current configuration in component 
+                "state". When you interact with controls (dropdowns, checkboxes), event handlers update 
+                the state. React then automatically re-renders the components that depend on that state, 
+                keeping the UI in sync with the data.
+            </p>
+        </div>
+
+        <!-- React App Root -->
+        <div id="react-root">
+            <!-- React will render the configurator component here -->
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                Loading React application...
+            </div>
+        </div>
+
+        <!-- Explanation Section -->
+        <div class="card mt-lg">
+            <h3>Understanding React's Approach</h3>
+            <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                <li><strong>State:</strong> The configurator stores all options (style, layout, features) in a state object.</li>
+                <li><strong>Updates:</strong> When you change an option, React updates the state and automatically re-renders affected components.</li>
+                <li><strong>Reactivity:</strong> The preview, summary, and price estimate all update automatically because they depend on the state.</li>
+                <li><strong>No Manual DOM:</strong> You don't need to manually select elements and update them. React handles it all.</li>
+            </ul>
+            <p style="margin-top: var(--spacing-md);">
+                This makes React excellent for complex interfaces where multiple parts need to stay 
+                synchronized as users interact with the application.
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><a href="index.html">← Back to Playground Home</a></p>
+    </footer>
+
+    <!-- Shared JavaScript -->
+    <script src="main.js"></script>
+    
+    <!-- React Application JavaScript -->
+    <script src="react-lab.js"></script>
+</body>
+</html>
+

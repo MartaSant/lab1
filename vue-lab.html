@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Lab - Interactive Website Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Vue 3 from CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <style>
+        /* Page-specific styles for vue-lab */
+        
+        .vue-intro {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .dashboard-container {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .dashboard-container h2 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .dashboard-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .filter-btn {
+            padding: var(--spacing-xs) var(--spacing-md);
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-white);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .elements-list {
+            display: grid;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .element-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-light);
+            transition: all var(--transition-base);
+            cursor: pointer;
+        }
+        
+        .element-item:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+        
+        .element-item.selected {
+            border-color: var(--success-color);
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .element-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        
+        .element-name {
+            flex: 1;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .element-category {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background-color: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: capitalize;
+        }
+        
+        .summary-section {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 2px solid var(--border-color);
+        }
+        
+        .summary-section h3 {
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+        
+        .summary-text {
+            background-color: var(--bg-light);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            color: var(--text-secondary);
+        }
+        
+        .summary-text strong {
+            color: var(--text-primary);
+        }
+        
+        .progress-container-inline {
+            margin-top: var(--spacing-md);
+        }
+        
+        .progress-bar-inline {
+            width: 100%;
+            height: 12px;
+            background-color: var(--bg-light);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-top: var(--spacing-sm);
+        }
+        
+        .progress-fill-inline {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: var(--radius-sm);
+            transition: width var(--transition-base);
+        }
+        
+        .toggle-all-btn {
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-xs) var(--spacing-md);
+            background-color: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all var(--transition-base);
+        }
+        
+        .toggle-all-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: var(--spacing-md);
+            }
+            
+            .element-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <a href="index.html" class="logo" style="font-weight: 600; color: var(--primary-color); text-decoration: none;">🎨 Playground</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="micro-interactions.html">Micro Interactions</a></li>
+                <li><a href="scroll-lab.html">Scroll Storytelling</a></li>
+                <li><a href="react-lab.html">React Lab</a></li>
+                <li><a href="vue-lab.html" class="active">Vue Lab</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <h1>🎯 Vue Lab</h1>
+            <p>Experience Vue's reactive data binding and computed properties</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Introduction -->
+        <div class="card vue-intro">
+            <h2>Welcome to the Vue Lab</h2>
+            <p>
+                Vue is a progressive JavaScript framework for building user interfaces. One of its 
+                standout features is its <strong>reactive data binding</strong>: when you change data 
+                in JavaScript, the HTML template automatically updates to reflect those changes.
+            </p>
+            <p>
+                Below, you'll find an <strong>Interaction Dashboard</strong> that demonstrates this. 
+                Toggle elements, filter the list, and watch how the summary and progress update 
+                automatically. Vue handles all the reactivity for you.
+            </p>
+            <p>
+                <strong>How it works:</strong> Vue tracks all data properties you define. When you 
+                change a property (like toggling an element), Vue automatically updates any parts of 
+                the template that depend on that data. Computed properties (like the summary text) 
+                also automatically recalculate when their dependencies change.
+            </p>
+        </div>
+
+        <!-- Vue App Root -->
+        <div id="vue-app" class="dashboard-container">
+            <h2>Interaction Dashboard</h2>
+            <p class="dashboard-description">
+                Toggle elements on/off and filter the list. Watch how the summary and progress 
+                update automatically as you interact with the controls.
+            </p>
+            
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button 
+                    class="filter-btn" 
+                    :class="{ active: filterCategory === 'all' }"
+                    @click="setFilter('all')">
+                    All
+                </button>
+                <button 
+                    class="filter-btn" 
+                    :class="{ active: filterCategory === 'visual' }"
+                    @click="setFilter('visual')">
+                    Visual Effects
+                </button>
+                <button 
+                    class="filter-btn" 
+                    :class="{ active: filterCategory === 'forms' }"
+                    @click="setFilter('forms')">
+                    Forms
+                </button>
+                <button 
+                    class="filter-btn" 
+                    :class="{ active: filterCategory === 'navigation' }"
+                    @click="setFilter('navigation')">
+                    Navigation
+                </button>
+            </div>
+            
+            <!-- Toggle All Button -->
+            <button class="toggle-all-btn" @click="toggleAll">
+                <span v-if="filteredElements.every(el => el.selected)">Deselect All</span>
+                <span v-else>Select All</span>
+            </button>
+            
+            <!-- Elements List -->
+            <div class="elements-list">
+                <div 
+                    v-for="element in filteredElements" 
+                    :key="element.id"
+                    class="element-item"
+                    :class="{ selected: element.selected }"
+                    @click="toggleElement(element)">
+                    <input 
+                        type="checkbox" 
+                        :checked="element.selected"
+                        @click.stop="toggleElement(element)"
+                        @change.stop>
+                    <span class="element-name">{{ element.name }}</span>
+                    <span class="element-category">{{ element.category }}</span>
+                </div>
+            </div>
+            
+            <!-- Summary Section -->
+            <div class="summary-section">
+                <h3>Your Selection Summary</h3>
+                <div class="summary-text">
+                    <p v-if="selectedCount === 0">
+                        No interactive elements selected yet. Toggle some items above to see the summary update.
+                    </p>
+                    <p v-else>
+                        You selected <strong>{{ selectedCount }}</strong> interactive element<span v-if="selectedCount !== 1">s</span>: 
+                        <strong>{{ selectedElementsList }}</strong>.
+                    </p>
+                </div>
+                
+                <!-- Progress Indicator -->
+                <div class="progress-container-inline">
+                    <p style="margin-bottom: var(--spacing-xs); color: var(--text-secondary);">
+                        Selection Progress: {{ selectedCount }} / {{ interactiveElements.length }}
+                    </p>
+                    <div class="progress-bar-inline">
+                        <div 
+                            class="progress-fill-inline" 
+                            :style="{ width: progressPercentage + '%' }">
+                        </div>
+                    </div>
+                    <p style="margin-top: var(--spacing-xs); text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
+                        {{ progressPercentage }}% Complete
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Section -->
+        <div class="card mt-lg">
+            <h3>Understanding Vue's Reactivity</h3>
+            <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                <li><strong>Data Properties:</strong> The list of interactive elements and filter are stored as reactive data.</li>
+                <li><strong>Template Binding:</strong> The HTML uses Vue directives (v-for, v-if, v-bind, etc.) to bind to data.</li>
+                <li><strong>Computed Properties:</strong> The summary text and progress are computed properties that automatically recalculate when data changes.</li>
+                <li><strong>Two-Way Binding:</strong> When you toggle checkboxes, Vue automatically updates the data, which then updates the summary.</li>
+            </ul>
+            <p style="margin-top: var(--spacing-md);">
+                Vue's reactivity system makes it easy to build dynamic interfaces where the UI 
+                automatically stays in sync with your data, without manual DOM manipulation.
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><a href="index.html">← Back to Playground Home</a></p>
+    </footer>
+
+    <!-- Shared JavaScript -->
+    <script src="main.js"></script>
+    
+    <!-- Vue Application JavaScript -->
+    <script src="vue-lab.js"></script>
+</body>
+</html>
+

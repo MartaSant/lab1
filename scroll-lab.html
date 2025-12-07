@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Storytelling - Interactive Website Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Page-specific styles for scroll-lab */
+        
+        .scroll-hint {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(99, 102, 241, 0.95);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            z-index: 50;
+            pointer-events: none;
+            transition: opacity var(--transition-base);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .scroll-hint.fade-out {
+            opacity: 0;
+        }
+        
+        .scroll-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl) var(--spacing-md);
+            text-align: center;
+        }
+        
+        .scroll-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+        
+        .scroll-section p {
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+        }
+        
+        .highlight-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+        
+        .timeline-section {
+            background-color: var(--bg-white);
+        }
+        
+        .timeline-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+        
+        .timeline-step {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            background-color: var(--bg-light);
+            transition: all var(--transition-slow);
+            opacity: 0.6;
+        }
+        
+        .timeline-step.active {
+            opacity: 1;
+            background-color: var(--bg-white);
+            box-shadow: var(--shadow-md);
+            transform: translateX(10px);
+        }
+        
+        .timeline-number {
+            flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .timeline-content h3 {
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .timeline-content p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .callout-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .callout-section h2,
+        .callout-section p {
+            color: white;
+        }
+        
+        .callout-box {
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .easter-egg-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .easter-egg-message.visible {
+            opacity: 1;
+        }
+        
+        .easter-egg-content {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 400px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        @media (max-width: 768px) {
+            .scroll-section h2 {
+                font-size: 2rem;
+            }
+            
+            .timeline-step {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <a href="index.html" class="logo" style="font-weight: 600; color: var(--primary-color); text-decoration: none;">🎨 Playground</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="micro-interactions.html">Micro Interactions</a></li>
+                <li><a href="scroll-lab.html" class="active">Scroll Storytelling</a></li>
+                <li><a href="react-lab.html">React Lab</a></li>
+                <li><a href="vue-lab.html">Vue Lab</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Sticky Scroll Hint -->
+    <div class="scroll-hint">
+        Scroll slowly: the content will reveal itself as you go
+    </div>
+
+    <!-- Section 1: Intro -->
+    <section class="scroll-section">
+        <div class="container">
+            <h2>Scrolling Can Guide Your Visitors Through a Story</h2>
+            <p>
+                As you scroll down this page, watch how content reveals itself gradually. 
+                This creates a narrative flow that guides visitors through information 
+                in a natural, engaging way.
+            </p>
+            <p style="margin-top: var(--spacing-md);">
+                Each section appears with a smooth animation, drawing attention to key 
+                messages and creating a sense of progression.
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 2: Highlight Example -->
+    <section class="scroll-section highlight-section">
+        <div class="container">
+            <h2>Progressive Disclosure</h2>
+            <p>
+                Instead of overwhelming visitors with all information at once, scrolling 
+                animations allow us to highlight key messages as they become relevant.
+            </p>
+            <p style="margin-top: var(--spacing-md);">
+                This technique is perfect for product showcases, service explanations, 
+                or any content where you want to control the pace of discovery.
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 3: Timeline -->
+    <section class="scroll-section timeline-section">
+        <div class="timeline-container">
+            <h2 style="text-align: center; margin-bottom: var(--spacing-xl);">A Journey in Steps</h2>
+            
+            <div class="timeline-step">
+                <div class="timeline-number">1</div>
+                <div class="timeline-content">
+                    <h3>Capture Attention</h3>
+                    <p>First impressions matter. An engaging scroll experience immediately draws visitors in and sets the tone for your brand.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-step">
+                <div class="timeline-number">2</div>
+                <div class="timeline-content">
+                    <h3>Tell Your Story</h3>
+                    <p>As users scroll, each section reveals part of your narrative. This creates a natural flow that's easier to digest than a wall of text.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-step">
+                <div class="timeline-number">3</div>
+                <div class="timeline-content">
+                    <h3>Engage and Retain</h3>
+                    <p>Interactive scroll effects keep users engaged. They're more likely to read through your content and take action.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-step">
+                <div class="timeline-number">4</div>
+                <div class="timeline-content">
+                    <h3>Create Impact</h3>
+                    <p>A well-designed scroll experience leaves a lasting impression and makes your website memorable.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Callout -->
+    <section class="scroll-section callout-section">
+        <div class="container">
+            <h2>Perfect for Your Project</h2>
+            <p>
+                This scroll storytelling approach can be customized for any type of content:
+            </p>
+            <div class="callout-box">
+                <h3 style="color: white; margin-bottom: var(--spacing-md);">Use Cases</h3>
+                <ul style="text-align: left; color: white; list-style: none; padding: 0;">
+                    <li style="margin-bottom: var(--spacing-sm);">✨ Product launches and feature showcases</li>
+                    <li style="margin-bottom: var(--spacing-sm);">📖 Company stories and brand narratives</li>
+                    <li style="margin-bottom: var(--spacing-sm);">🎯 Service explanations and value propositions</li>
+                    <li style="margin-bottom: var(--spacing-sm);">📊 Portfolio presentations and case studies</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Closing -->
+    <section class="scroll-section">
+        <div class="container">
+            <h2>Ready to Create Your Story?</h2>
+            <p>
+                Scroll-based storytelling transforms static pages into dynamic experiences. 
+                Your visitors become active participants in discovering your content, 
+                creating a more engaging and memorable interaction.
+            </p>
+            <p style="margin-top: var(--spacing-md);">
+                <a href="index.html" class="btn" style="margin-top: var(--spacing-md);">Explore More Features</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><a href="index.html">← Back to Playground Home</a></p>
+    </footer>
+
+    <!-- Shared JavaScript -->
+    <script src="main.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <script src="scroll-lab.js"></script>
+</body>
+</html>
+
