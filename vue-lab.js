@@ -7,6 +7,11 @@
 (function() {
     'use strict';
     
+    // Global flags to prevent multiple initializations
+    let vueAppInitialized = false;
+    let vueAppInitializing = false;
+    let vueAppInstance = null;
+    
     // Template HTML defined as string to avoid DOM parsing issues
     const vueTemplate = `
         <h2>Interaction Dashboard</h2>
@@ -102,6 +107,16 @@
      * Initialize Vue app when DOM and Vue are ready
      */
     function initVueApp() {
+        // Prevent multiple initializations
+        if (vueAppInitialized) {
+            return true;
+        }
+        
+        // Prevent concurrent initialization attempts
+        if (vueAppInitializing) {
+            return false;
+        }
+        
         const rootElement = document.getElementById('vue-app');
         
         if (!rootElement) {
@@ -109,11 +124,15 @@
             return false;
         }
         
+        // Check if Vue is already mounted on this element (from a previous attempt)
+        if (rootElement.__vue_app__ && vueAppInitialized) {
+            console.log('Vue app already initialized on this element');
+            return true;
+        }
+        
         // Check if Vue is loaded
         if (typeof Vue === 'undefined') {
-            console.error('Vue 3 not loaded from CDN');
-            showVueError(rootElement);
-            return false;
+            return false; // Don't show error yet, will retry
         }
         
         // Check if createApp is available
@@ -123,15 +142,40 @@
             return false;
         }
         
+        // Mark as initializing to prevent concurrent attempts
+        vueAppInitializing = true;
+        
         try {
-            // Clear the root element first
+            // If there's a previous instance, unmount it first
+            if (vueAppInstance) {
+                console.warn('Unmounting previous Vue app instance');
+                try {
+                    vueAppInstance.unmount();
+                } catch (e) {
+                    console.warn('Error unmounting previous Vue app:', e);
+                }
+                vueAppInstance = null;
+            }
+            
+            // Check if Vue has already mounted something on this element
+            // Vue 3 stores the app context on the element
+            if (rootElement.__vue_app__) {
+                console.warn('Vue app already mounted on element, unmounting');
+                try {
+                    rootElement.__vue_app__.unmount();
+                } catch (e) {
+                    console.warn('Error unmounting Vue app from element:', e);
+                }
+            }
+            
+            // Clear the root element completely
             rootElement.innerHTML = '';
             
             // Create Vue application
             // Vue 3 uses createApp instead of new Vue()
             const { createApp } = Vue;
             
-            createApp({
+            vueAppInstance = createApp({
                 // Use the template string defined above
                 template: vueTemplate,
                 
@@ -242,14 +286,32 @@
                         });
                     }
                 }
-            }).mount(rootElement);
-                
+            });
+            
+            // Mount the app first
+            vueAppInstance.mount(rootElement);
+            
+            // Only mark as initialized AFTER successful mount
+            vueAppInitialized = true;
+            vueAppInitializing = false;
+            
             console.log('Vue app initialized successfully');
             return true;
         } catch (error) {
             console.error('Error initializing Vue app:', error);
             console.error('Error stack:', error.stack);
-            showVueError(rootElement, error.message);
+            
+            // Reset state on error
+            vueAppInitialized = false;
+            vueAppInitializing = false;
+            vueAppInstance = null;
+            
+            // Clear the element and show error
+            if (rootElement) {
+                rootElement.innerHTML = '';
+                showVueError(rootElement, error.message);
+            }
+            
             return false;
         }
     }
@@ -289,19 +351,39 @@
     // Wait for Vue to load from CDN, then initialize
     let initAttempts = 0;
     const maxAttempts = 10;
+    let initializationScheduled = false;
     
     function tryInitVue() {
-        initAttempts++;
+        // Prevent multiple simultaneous attempts
+        if (vueAppInitialized || vueAppInitializing || initializationScheduled) {
+            return;
+        }
         
-        if (initVueApp()) {
-            // Success!
+        // Check if already initialized (double-check)
+        if (vueAppInitialized) {
+            return;
+        }
+        
+        initAttempts++;
+        initializationScheduled = true;
+        
+        const success = initVueApp();
+        
+        initializationScheduled = false;
+        
+        if (success) {
+            // Success! No need to retry
             return;
         }
         
         // If Vue not loaded yet and we haven't exceeded max attempts, try again
-        if (initAttempts < maxAttempts && typeof Vue === 'undefined') {
-            setTimeout(tryInitVue, 300);
-        } else if (initAttempts >= maxAttempts) {
+        if (initAttempts < maxAttempts && typeof Vue === 'undefined' && !vueAppInitialized) {
+            setTimeout(function() {
+                if (!vueAppInitialized && !vueAppInitializing) {
+                    tryInitVue();
+                }
+            }, 300);
+        } else if (initAttempts >= maxAttempts && !vueAppInitialized) {
             // Give up after max attempts
             const rootElement = document.getElementById('vue-app');
             if (rootElement && typeof Vue === 'undefined') {
@@ -310,18 +392,23 @@
         }
     }
     
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(tryInitVue, 100);
-        });
-    } else {
+    // Wait for DOM to be ready - use a single initialization point
+    function scheduleInit() {
+        if (vueAppInitialized || initializationScheduled) {
+            return;
+        }
         setTimeout(tryInitVue, 100);
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', scheduleInit);
+    } else {
+        scheduleInit();
     }
     
     // Also try initializing after window load in case CDN loads slowly
     window.addEventListener('load', function() {
-        if (initAttempts < maxAttempts) {
+        if (!vueAppInitialized && initAttempts < maxAttempts) {
             setTimeout(tryInitVue, 200);
         }
     });
