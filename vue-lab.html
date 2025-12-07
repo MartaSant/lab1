@@ -231,92 +231,9 @@
 
         <!-- Vue App Root -->
         <div id="vue-app" class="dashboard-container">
-            <h2>Interaction Dashboard</h2>
-            <p class="dashboard-description">
-                Toggle elements on/off and filter the list. Watch how the summary and progress 
-                update automatically as you interact with the controls.
-            </p>
-            
-            <!-- Filter Buttons -->
-            <div class="filter-buttons">
-                <button 
-                    class="filter-btn" 
-                    :class="{ active: filterCategory === 'all' }"
-                    @click="setFilter('all')">
-                    All
-                </button>
-                <button 
-                    class="filter-btn" 
-                    :class="{ active: filterCategory === 'visual' }"
-                    @click="setFilter('visual')">
-                    Visual Effects
-                </button>
-                <button 
-                    class="filter-btn" 
-                    :class="{ active: filterCategory === 'forms' }"
-                    @click="setFilter('forms')">
-                    Forms
-                </button>
-                <button 
-                    class="filter-btn" 
-                    :class="{ active: filterCategory === 'navigation' }"
-                    @click="setFilter('navigation')">
-                    Navigation
-                </button>
-            </div>
-            
-            <!-- Toggle All Button -->
-            <button class="toggle-all-btn" @click="toggleAll">
-                <span v-if="filteredElements.every(el => el.selected)">Deselect All</span>
-                <span v-else>Select All</span>
-            </button>
-            
-            <!-- Elements List -->
-            <div class="elements-list">
-                <div 
-                    v-for="element in filteredElements" 
-                    :key="element.id"
-                    class="element-item"
-                    :class="{ selected: element.selected }"
-                    @click="toggleElement(element)">
-                    <input 
-                        type="checkbox" 
-                        :checked="element.selected"
-                        @click.stop="toggleElement(element)"
-                        @change.stop>
-                    <span class="element-name">{{ element.name }}</span>
-                    <span class="element-category">{{ element.category }}</span>
-                </div>
-            </div>
-            
-            <!-- Summary Section -->
-            <div class="summary-section">
-                <h3>Your Selection Summary</h3>
-                <div class="summary-text">
-                    <p v-if="selectedCount === 0">
-                        No interactive elements selected yet. Toggle some items above to see the summary update.
-                    </p>
-                    <p v-else>
-                        You selected <strong>{{ selectedCount }}</strong> interactive element<span v-if="selectedCount !== 1">s</span>: 
-                        <strong>{{ selectedElementsList }}</strong>.
-                    </p>
-                </div>
-                
-                <!-- Progress Indicator -->
-                <div class="progress-container-inline">
-                    <p style="margin-bottom: var(--spacing-xs); color: var(--text-secondary);">
-                        Selection Progress: {{ selectedCount }} / {{ interactiveElements.length }}
-                    </p>
-                    <div class="progress-bar-inline">
-                        <div 
-                            class="progress-fill-inline" 
-                            :style="{ width: progressPercentage + '%' }">
-                        </div>
-                    </div>
-                    <p style="margin-top: var(--spacing-xs); text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
-                        {{ progressPercentage }}% Complete
-                    </p>
-                </div>
+            <!-- Vue will render the dashboard here -->
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                Caricamento dell'applicazione Vue...
             </div>
         </div>
 

@@ -7,6 +7,97 @@
 (function() {
     'use strict';
     
+    // Template HTML defined as string to avoid DOM parsing issues
+    const vueTemplate = `
+        <h2>Interaction Dashboard</h2>
+        <p class="dashboard-description">
+            Toggle elements on/off and filter the list. Watch how the summary and progress 
+            update automatically as you interact with the controls.
+        </p>
+        
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+            <button 
+                class="filter-btn" 
+                :class="{ active: filterCategory === 'all' }"
+                @click="setFilter('all')">
+                All
+            </button>
+            <button 
+                class="filter-btn" 
+                :class="{ active: filterCategory === 'visual' }"
+                @click="setFilter('visual')">
+                Visual Effects
+            </button>
+            <button 
+                class="filter-btn" 
+                :class="{ active: filterCategory === 'forms' }"
+                @click="setFilter('forms')">
+                Forms
+            </button>
+            <button 
+                class="filter-btn" 
+                :class="{ active: filterCategory === 'navigation' }"
+                @click="setFilter('navigation')">
+                Navigation
+            </button>
+        </div>
+        
+        <!-- Toggle All Button -->
+        <button class="toggle-all-btn" @click="toggleAll">
+            <span v-if="filteredElements.length > 0 && filteredElements.every(el => el.selected)">Deselect All</span>
+            <span v-else>Select All</span>
+        </button>
+        
+        <!-- Elements List -->
+        <div class="elements-list">
+            <div 
+                v-for="element in filteredElements" 
+                :key="element.id"
+                class="element-item"
+                :class="{ selected: element.selected }"
+                @click="toggleElement(element)">
+                <input 
+                    type="checkbox" 
+                    :checked="element.selected"
+                    @click.stop="toggleElement(element)"
+                    @change.stop>
+                <span class="element-name">{{ element.name }}</span>
+                <span class="element-category">{{ element.category }}</span>
+            </div>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <h3>Your Selection Summary</h3>
+            <div class="summary-text">
+                <p v-if="selectedCount === 0">
+                    No interactive elements selected yet. Toggle some items above to see the summary update.
+                </p>
+                <p v-else>
+                    You selected <strong>{{ selectedCount }}</strong> interactive element<span v-if="selectedCount !== 1">s</span>: 
+                    <strong>{{ selectedElementsList }}</strong>.
+                </p>
+            </div>
+            
+            <!-- Progress Indicator -->
+            <div class="progress-container-inline">
+                <p style="margin-bottom: var(--spacing-xs); color: var(--text-secondary);">
+                    Selection Progress: {{ selectedCount }} / {{ interactiveElements.length }}
+                </p>
+                <div class="progress-bar-inline">
+                    <div 
+                        class="progress-fill-inline" 
+                        :style="{ width: progressPercentage + '%' }">
+                    </div>
+                </div>
+                <p style="margin-top: var(--spacing-xs); text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
+                    {{ progressPercentage }}% Complete
+                </p>
+            </div>
+        </div>
+    `;
+    
     /**
      * Initialize Vue app when DOM and Vue are ready
      */
@@ -33,123 +124,131 @@
         }
         
         try {
+            // Clear the root element first
+            rootElement.innerHTML = '';
+            
             // Create Vue application
             // Vue 3 uses createApp instead of new Vue()
             const { createApp } = Vue;
             
             createApp({
-            // The data function returns reactive data
-            // All properties here become reactive - when they change, the UI updates automatically
-            data() {
-                return {
-                    // List of available interactive elements
-                    interactiveElements: [
-                        { id: 1, name: 'Animated buttons', category: 'visual', selected: false },
-                        { id: 2, name: 'Scroll effects', category: 'visual', selected: false },
-                        { id: 3, name: 'Dynamic forms', category: 'forms', selected: false },
-                        { id: 4, name: 'Live previews', category: 'visual', selected: false },
-                        { id: 5, name: 'Interactive maps', category: 'navigation', selected: false },
-                        { id: 6, name: 'Contact forms', category: 'forms', selected: false },
-                        { id: 7, name: 'Search functionality', category: 'navigation', selected: false },
-                        { id: 8, name: 'Image galleries', category: 'visual', selected: false }
-                    ],
+                // Use the template string defined above
+                template: vueTemplate,
+                
+                // The data function returns reactive data
+                // All properties here become reactive - when they change, the UI updates automatically
+                data() {
+                    return {
+                        // List of available interactive elements
+                        interactiveElements: [
+                            { id: 1, name: 'Animated buttons', category: 'visual', selected: false },
+                            { id: 2, name: 'Scroll effects', category: 'visual', selected: false },
+                            { id: 3, name: 'Dynamic forms', category: 'forms', selected: false },
+                            { id: 4, name: 'Live previews', category: 'visual', selected: false },
+                            { id: 5, name: 'Interactive maps', category: 'navigation', selected: false },
+                            { id: 6, name: 'Contact forms', category: 'forms', selected: false },
+                            { id: 7, name: 'Search functionality', category: 'navigation', selected: false },
+                            { id: 8, name: 'Image galleries', category: 'visual', selected: false }
+                        ],
+                        
+                        // Current filter selection
+                        filterCategory: 'all' // 'all', 'visual', 'forms', 'navigation'
+                    };
+                },
+                
+                // Computed properties are automatically cached and re-evaluate when dependencies change
+                // They're perfect for derived data
+                computed: {
+                    /**
+                     * Filter elements based on selected category
+                     * This automatically updates when filterCategory or interactiveElements change
+                     */
+                    filteredElements() {
+                        if (this.filterCategory === 'all') {
+                            return this.interactiveElements;
+                        }
+                        return this.interactiveElements.filter(
+                            element => element.category === this.filterCategory
+                        );
+                    },
                     
-                    // Current filter selection
-                    filterCategory: 'all' // 'all', 'visual', 'forms', 'navigation'
-                };
-            },
-            
-            // Computed properties are automatically cached and re-evaluate when dependencies change
-            // They're perfect for derived data
-            computed: {
-                /**
-                 * Filter elements based on selected category
-                 * This automatically updates when filterCategory or interactiveElements change
-                 */
-                filteredElements() {
-                    if (this.filterCategory === 'all') {
-                        return this.interactiveElements;
-                    }
-                    return this.interactiveElements.filter(
-                        element => element.category === this.filterCategory
-                    );
-                },
-                
-                /**
-                 * Get count of selected elements
-                 * Automatically recalculates when any element's selected state changes
-                 */
-                selectedCount() {
-                    return this.interactiveElements.filter(el => el.selected).length;
-                },
-                
-                /**
-                 * Get list of selected element names
-                 * Creates a comma-separated string of selected items
-                 */
-                selectedElementsList() {
-                    const selected = this.interactiveElements
-                        .filter(el => el.selected)
-                        .map(el => el.name);
+                    /**
+                     * Get count of selected elements
+                     * Automatically recalculates when any element's selected state changes
+                     */
+                    selectedCount() {
+                        return this.interactiveElements.filter(el => el.selected).length;
+                    },
                     
-                    if (selected.length === 0) {
-                        return 'None';
-                    } else if (selected.length === 1) {
-                        return selected[0];
-                    } else if (selected.length === 2) {
-                        return selected.join(' and ');
-                    } else {
-                        const last = selected.pop();
-                        return selected.join(', ') + ', and ' + last;
+                    /**
+                     * Get list of selected element names
+                     * Creates a comma-separated string of selected items
+                     */
+                    selectedElementsList() {
+                        const selected = this.interactiveElements
+                            .filter(el => el.selected)
+                            .map(el => el.name);
+                        
+                        if (selected.length === 0) {
+                            return 'None';
+                        } else if (selected.length === 1) {
+                            return selected[0];
+                        } else if (selected.length === 2) {
+                            return selected.join(' and ');
+                        } else {
+                            const last = selected.pop();
+                            return selected.join(', ') + ', and ' + last;
+                        }
+                    },
+                    
+                    /**
+                     * Calculate progress percentage
+                     * Shows how many elements are selected out of total
+                     */
+                    progressPercentage() {
+                        const total = this.interactiveElements.length;
+                        return total > 0 ? Math.round((this.selectedCount / total) * 100) : 0;
                     }
                 },
                 
-                /**
-                 * Calculate progress percentage
-                 * Shows how many elements are selected out of total
-                 */
-                progressPercentage() {
-                    const total = this.interactiveElements.length;
-                    return total > 0 ? Math.round((this.selectedCount / total) * 100) : 0;
+                // Methods are functions that can be called from templates
+                methods: {
+                    /**
+                     * Toggle the selected state of an element
+                     * @param {Object} element - The element to toggle
+                     */
+                    toggleElement(element) {
+                        // Vue's reactivity system automatically detects this change
+                        // and updates any computed properties or template bindings that depend on it
+                        element.selected = !element.selected;
+                    },
+                    
+                    /**
+                     * Update the filter category
+                     * @param {String} category - The category to filter by
+                     */
+                    setFilter(category) {
+                        this.filterCategory = category;
+                    },
+                    
+                    /**
+                     * Select or deselect all visible (filtered) elements
+                     */
+                    toggleAll() {
+                        if (this.filteredElements.length === 0) return;
+                        const allSelected = this.filteredElements.every(el => el.selected);
+                        this.filteredElements.forEach(el => {
+                            el.selected = !allSelected;
+                        });
+                    }
                 }
-            },
-            
-            // Methods are functions that can be called from templates
-            methods: {
-                /**
-                 * Toggle the selected state of an element
-                 * @param {Object} element - The element to toggle
-                 */
-                toggleElement(element) {
-                    // Vue's reactivity system automatically detects this change
-                    // and updates any computed properties or template bindings that depend on it
-                    element.selected = !element.selected;
-                },
+            }).mount(rootElement);
                 
-                /**
-                 * Update the filter category
-                 * @param {String} category - The category to filter by
-                 */
-                setFilter(category) {
-                    this.filterCategory = category;
-                },
-                
-                /**
-                 * Select or deselect all visible (filtered) elements
-                 */
-                toggleAll() {
-                    const allSelected = this.filteredElements.every(el => el.selected);
-                    this.filteredElements.forEach(el => {
-                        el.selected = !allSelected;
-                    });
-                }
-            }
-        }).mount(rootElement);
-            
             console.log('Vue app initialized successfully');
             return true;
         } catch (error) {
             console.error('Error initializing Vue app:', error);
+            console.error('Error stack:', error.stack);
             showVueError(rootElement, error.message);
             return false;
         }
@@ -178,9 +277,9 @@
                     </ul>
                 </div>
                 ` : ''}
-                ${errorMessage ? `<p style="font-size: 0.875rem; color: var(--text-secondary);">Errore: ${errorMessage}</p>` : ''}
+                ${errorMessage ? `<p style="font-size: 0.875rem; color: var(--accent-color); margin-top: 0.5rem;"><strong>Errore:</strong> ${errorMessage}</p>` : ''}
                 <p style="margin-top: 1rem; font-size: 0.875rem;">
-                    Ricarica la pagina o controlla la connessione internet.
+                    Ricarica la pagina o controlla la connessione internet. Apri la console (F12) per maggiori dettagli.
                 </p>
             </div>
         `;
@@ -211,6 +310,7 @@
         }
     }
     
+    // Wait for DOM to be ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(tryInitVue, 100);
@@ -226,4 +326,3 @@
         }
     });
 })();
-
